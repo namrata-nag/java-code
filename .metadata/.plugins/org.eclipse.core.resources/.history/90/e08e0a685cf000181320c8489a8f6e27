@@ -1,0 +1,27 @@
+package linkList;
+
+public class SingleLinkList {
+	    Node head; 
+		public class Node{
+			int data;
+			Node next;
+			Node(){
+				
+			}
+		}
+		void append(int data){
+			Node o1 = new Node();
+			head = o1;
+			System.out.print(head);
+			
+		}
+		void insert(){
+			System.out.print(head);
+		}
+		public static void main(String str[]){
+			SingleLinkList obj = new SingleLinkList();
+			SingleLinkList obj1 = new SingleLinkList();
+			obj.append(6);
+			obj1.insert();
+		}
+}
