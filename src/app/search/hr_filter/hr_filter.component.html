@@ -1,0 +1,48 @@
+
+<!--<div id="mySidenav" #sidenav class="sidenav">-->
+<!--<a href="javascript:void(0)" class="closebtn" (click)="toggleSidenav()">&times;</a>-->
+
+<div class="wrapper">
+  <div class="filter">
+      <!-- <div class="form-group category">
+          <label class="title" >Currently Working At Shell </label>
+          <div [ngStyle]="getStyle(regions)" class="scrollbar">
+          <div *ngFor="let region of regions">
+            <div class="select">
+              <input type="checkbox" class="region" (click)="clicked($event,'regions')" value="{{region.name}}"> {{region.name}}
+              ({{region.count}})
+            </div>
+          </div>
+           </div>
+        </div> -->
+    <div class="form-group category">
+      <label class="title">Currently Working at Shell </label>
+      <div [ngStyle]="getStyle(assetNames)" class="scrollbar">
+      <div *ngFor="let asset of assetNames">
+        <div class="select">
+          <input type="checkbox" class="asset" (click)="clicked($event,'assets')" value="{{asset.name}}"> {{asset.name}}
+          ({{asset.count}})
+        </div>
+      </div> </div>
+    </div>
+    <div class="form-group category">
+      <label class="title">Roles </label>
+      <div [ngStyle]="getStyle(fieldNames)" class="scrollbar">
+      <div *ngFor="let field of fieldNames">
+        <div class="select">
+          <input type="checkbox" class="field" (click)="clicked($event,'fields')" value="{{field.name}}"> {{field.name}}
+          ({{field.count}})
+        </div>
+      </div> </div>
+    </div>
+    
+    <div class =" resetBtnDiv">
+    <button class="btn btn-primary filterResetBtn" type="submit" (click)="reset()">Reset</button>
+  </div>
+  </div>
+</div>
+<!--</div>-->
+
+<!--<div id="main">
+            <span class="toggle-btn" (click)="toggleSidenav()">&#9776; </span>
+</div>-->

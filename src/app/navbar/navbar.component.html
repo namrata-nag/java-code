@@ -1,0 +1,73 @@
+<nav class="navbar navbar-default navbar-fixed-top container-fluid row">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="col-xs-1 col-md-1 logo-col">
+        <a href="#">
+            <img id="shell-logo" src="../../assets/BP-Logo.png" alt="Shell">
+        </a>
+    </div>
+    <div class="col-xs-2 col-md-2"></div>
+
+    <div class="col-xs-6 col-md-6 title-holder">
+        <h1 class="text-center">Smart Search</h1>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="col-xs-3 col-md-3 right-menu-holder">
+        <div *ngIf='getDropdownVisibility()' class="inline-display">
+            <ul class="nav navbar-nav">
+                <li class="dropdown title-holder" *ngIf="getDropdownVisibility() && isStaff">
+                    <!--<button class='btn btn-link admin-btn' (click)="gotoAdmin()">admin</button>-->
+
+                    <a class="dropdown-toggle" id="admin-menu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="item-head">Admin Menu</span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="admin-menu">
+                        <li style="cursor:pointer;" (click)="gotoSearch()">
+                            <a>
+                                <span class="items"> Home</span>
+                            </a>
+                        </li>
+                        <li style="cursor:pointer;">
+                            <a routerLink="admin">
+                                <span class="items"> Feedback</span>
+                            </a>
+                        </li>
+                        <li style="cursor:pointer;">
+                            <a routerLink="file-upload">
+                                <span class="items"> Discovery Files</span>
+                            </a>
+                        </li>
+                    </ul>
+
+
+                </li>
+                <li class="dropdown title-holder">
+                    <a href="#" class="glyphicon glyphicon-user dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        <span class="item-head">Hello, {{user && user.username}}</span>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="" class="glyphicon glyphicon-question-sign">
+                                <span class="items"> Help</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="" class="glyphicon glyphicon-shopping-cart">
+                                <span class="items"> Cart</span>
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <a (click)="logout()">
+                                <span class="items">Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,10 @@
+Observations/Assumptions :
+1) There can be 2 intents but just 1 well name.
+2) For milestone 1 well name is to be provided because aggregation is not considered
+3) Will support filter and aggregation not two seperate queries based upon the intents
+4) From lithology data we are only considering the Cutting Log Description part as the entries like Rig Operator Azimuth will be covered from other documents.
+
+########################################################################################################################
+We need to have the API-Well Name mapping dictionary stored in the data folder along with the well master json and the relevant data files related to each wells all in the same folder.
+########################################################################################################################
+ 

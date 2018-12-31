@@ -1,0 +1,366 @@
+<ng-template #loadingref>
+  <div class="loader1">
+
+    <div class="row" style="margin-top:7%">
+<div class="col-md-6 col-md-offset-3" align="center">
+  <div class="loader"></div>
+  <div style="margin-top:2%">Getting Feedbacks</div>
+</div>
+</div>
+</div>
+</ng-template>
+
+<ng-template #errormsg>
+  <div class="">
+    <div class="row" style="margin-top:15%">
+<div class="col-md-6 col-md-offset-3" align="center">
+  <p style="color:red;font-size:120%"> Internal Server Error </p>
+</div>
+</div>
+</div>
+</ng-template>
+
+<div *ngIf="!error;else errormsg">
+  <div class="admin_wrapper" *ngIf="!loading;else loadingref">
+    <div class="row">
+      <div class="">
+        <div class="col-md-12 col-lg-12 col-xs-12">
+          <ng-template #loadingref>
+            <div class="loader1">
+
+              <div class="row" style="margin-top:7%">
+<div class="col-md-6 col-md-offset-3" align="center">
+  <div class="loader"></div>
+  <div style="margin-top:2%">Getting Feedbacks</div>
+</div>
+</div>
+</div>
+</ng-template>
+
+<div class="col-md-8 col-lg-8 col-xs-12">
+  <input type="file" class="form-control fieldInput" name="single" ng2FileSelect [uploader]="uploader" />
+  <div align="center">
+    <span *ngIf="uploader.progress==100;else" id="progresStatus" style="color:green"> File has been uploaded successfully.Please check after 1 minute.
+</span>
+</div>
+</div>
+
+<div class="col-md-4 col-lg-4 col-xs-12 groupbtn">
+  <button type="button" data-target="#progresStatus" class="btn btn-success btn-s uploadBtn" (click)="uploader.uploadAll()"
+    [disabled]="!uploader.getNotUploadedItems().length">
+            <span class="glyphicon glyphicon-upload"></span> Upload
+          </button>
+
+  <button type="button" class="btn btn-s btn-info refreshBtn" (click)="refresh()">
+            <span class="glyphicon glyphicon-refresh"></span> Refresh table
+          </button>
+  <button type="buttton" class="btn btn-s btn-primary refreshBtn" (click)="gotoSearch()">
+            <span class="glyphicon glyphicon-search " > </span> Goto Search
+          </button>
+</div>
+
+
+
+<div class="col-xs-12 col-md-12 col-lg-12">
+  <table class="table table-hover">
+    <thead class="tableHeader">
+      <tr>
+        <th>S.No </th>
+
+        <th>Question</th>
+        <th> Edit</th>
+        <th>Old Intent 1</th>
+        <th>Old Intent 2</th>
+        <th>New Intent </th>
+
+        <th>Comment</th>
+
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let x of feedback | paginate: config ;let i = index;">
+        <td>
+
+          {{(config.currentPage - 1) * config.itemsPerPage + i +1 }}
+        </td>
+
+        <td>
+
+          <span>
+                    <input type="text" class="form-control" [disabled]="disabled[(config.currentPage - 1) * config.itemsPerPage + i +1]" [(ngModel)]="x.new_question_1">
+                  </span>
+          <div style="margin-top:3%;" *ngIf="anotherq[(config.currentPage - 1) * config.itemsPerPage + i]">
+<input type="text" class="form-control" [disabled]="disabled[(config.currentPage - 1) * config.itemsPerPage + i +1]" [(ngModel)]="question2[(config.currentPage - 1) * config.itemsPerPage + i+1]"
+  placeholder="Type second question here">
+</div>
+</td>
+<td>
+
+  <button style="background:transparent;border:none;" class=" glyphicon glyphicon-pencil" [disabled]="disabled[(config.currentPage - 1) * config.itemsPerPage + i +1]" (click)="toogle((config.currentPage
+- 1) * config.itemsPerPage + i+1 )"></button>
+</td>
+<td>
+  {{ x.old_intent_1 }}
+  <div style="margin-top:30px" *ngIf="anotherq[(config.currentPage - 1) * config.itemsPerPage + i ]"> {{ x.old_intent_1 }}
+</div>
+</td>
+<td>
+  {{ x.old_intent_2 }}
+  <div style="margin-top:30px" *ngIf="anotherq[(config.currentPage - 1) * config.itemsPerPage + i ]"> {{ x.old_intent_2 }}
+</div>
+</td>
+<td style="width:10%">
+<ss-multiselect-dropdown [disabled]="disabled[(config.currentPage - 1) * config.itemsPerPage + i +1 ]" [options]="myOptions"
+  [settings]="selectsettings" [(ngModel)]="selected[(config.currentPage - 1) * config.itemsPerPage + i +1]" (ngModelChange)="onChange($event)"></ss-multiselect-dropdown>
+<div style="margin-top:7px" *ngIf="anotherq[(config.currentPage - 1) * config.itemsPerPage + i]">
+<ss-multiselect-dropdown [disabled]="disabled[(config.currentPage - 1) * config.itemsPerPage + i +1]" [options]="myOptions"
+  [settings]="selectsettings" [(ngModel)]="selected2[(config.currentPage - 1) * config.itemsPerPage + i +1]" (ngModelChange)="onChange($event)"></ss-multiselect-dropdown>
+</div>
+</td>
+<td>
+  {{ x.comment }}
+  <div style="margin-top:25px" *ngIf="anotherq[(config.currentPage - 1) * config.itemsPerPage + i]"> {{x.comment}}
+</div>
+</td>
+<td align="center" *ngIf="showmessage[(config.currentPage - 1) * config.itemsPerPage + i +1]!=1;else message ">
+
+  <button class="btn btn-success" (click)="approveRow((config.currentPage - 1) * config.itemsPerPage + i +1 )">
+                    <span class="glyphicon glyphicon-ok"></span>
+                  </button>
+
+  <button class="btn btn-danger" (click)="deleteRow((config.currentPage - 1) * config.itemsPerPage + i +1)">
+                    <span class="glyphicon glyphicon-remove"></span>
+                  </button>
+</td>
+
+<ng-template #message>
+  <td>
+    <span style="color:green">Added to approved list</span>
+</td>
+
+</ng-template>
+</tr>
+
+
+</tbody>
+
+
+</table>
+
+</div>
+<div class="col-md-12 col-xs-12 col-lg-12 col-sm-12" align="center">
+  <pagination-controls (pageChange)="config.currentPage = $event" id="advanced"></pagination-controls>
+</div>
+
+
+
+<div class="col-md-12 col-xs-12 col-lg-12" align="center">
+  <!-- <button type="button" class="btn btn-primary submitBtn" data-toggle="modal" data-target="#fbModal" (click)="sendjson()" >Submit</button> -->
+  <button type="button" class="btn btn-primary submitBtn" (click)="sendjson()">Submit</button>
+
+</div>
+
+</div>
+</div>
+
+
+
+</div>
+</div>
+</div>
+
+<!-- <ng-template #loadingref>
+  <div class="container loader1" >
+    
+    <div class="row" style="margin-top:7%">
+      <div class="col-md-6 col-md-offset-3" align="center">
+        <div class="loader"></div>
+        <div style="margin-top:2%">Getting Feedbacks</div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #errormsg>
+  <div class="container">
+    <div class="row" style="margin-top:30%">
+      <div class="col-md-6 col-md-offset-3" align="center">
+        <p style="color:red"> Internal Server Error </p>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<div  class="" *ngIf="!error;else errormsg">
+  <div class=" admin_wrapper" style="font-family: 'Ubuntu', sans-serif;" *ngIf="!loading;else loadingref">
+    
+    <div class="row">
+      
+      <div class="col-md-8 col-xs-12 col-lg-8" style="margin-top:30px">
+        <input type="file" class="form-control fieldInput" name="single" ng2FileSelect [uploader]="uploader" />  
+        <div align="center">
+          <span *ngIf="uploader.progress==100;else" id="progresStatus" style="color:green">Uploaded</span>  
+        </div>
+      </div>
+      
+      <div class="col-md-4 col-xs-12 col-lg-4" style="display:inline-block">
+        <button type="button"  data-target="#progresStatus" class="btn btn-success btn-s uploadBtn"
+        (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
+        <span class="glyphicon glyphicon-upload"></span> Upload
+      </button>
+      <button type="button" class="btn btn-s btn-info refreshBtn" (click)="refresh()">
+        <span class="glyphicon glyphicon-refresh"></span> Refresh table
+      </button>
+      <button type="buttton" class="btn btn-s btn-primary refreshBtn" (click)="gotoSearch()">
+        <span class="glyphicon glyphicon-search " > </span> Goto Search
+      </button>
+    </div>
+    
+  </div>
+  
+  <div class = "feedbackTable">
+    
+    <table class="table table-responsive">
+      <thead class="tableHeader">
+        <tr>
+          <th>S.No </th>
+          
+          <th>Question</th>
+          <th> Edit</th>
+          <th>Old Intent 1</th>
+          <th>Old Intent 2</th>
+          <th>New Intent </th>
+          
+          <th>Comment</th>
+          
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let x of feedback | paginate: config ;let i = index;">
+          <td>
+            
+            {{(config.currentPage - 1) * config.itemsPerPage + i +1 }}
+          </td>
+          
+          <td>
+            
+            <span>
+              <input type="text" class="form-control" [(ngModel)]="x.question">
+            </span>
+            <div style="margin-top:3%;" *ngIf="anotherq[(config.currentPage - 1) * config.itemsPerPage + i]">
+              <input type="text" class="form-control" placeholder="Type second question here" [(ngModel)]="question2[(config.currentPage - 1) * config.itemsPerPage + i+1]">
+            </div>
+          </td>
+          <td>
+            
+            <a class=" glyphicon glyphicon-pencil" (click)="toogle((config.currentPage - 1) * config.itemsPerPage + i+1 )"></a>
+          </td>		  
+          <td>
+            {{ x.oldintent1 }}
+            <div style="margin-top:30px" *ngIf="anotherq[(config.currentPage - 1) * config.itemsPerPage + i ]">
+              {{ x.oldintent1 }}
+            </div>
+          </td>
+          <td>
+            {{ x.oldintent2 }}
+            <div style="margin-top:30px" *ngIf="anotherq[(config.currentPage - 1) * config.itemsPerPage + i ]">
+              {{ x.oldintent2 }}
+            </div>
+          </td>
+          <td style="width:10%">
+            <ss-multiselect-dropdown [options]="myOptions" [settings]="selectsettings" [(ngModel)]="selected[(config.currentPage - 1) * config.itemsPerPage + i +1]" (ngModelChange)="onChange($event)"></ss-multiselect-dropdown>
+            <div style="margin-top:7px" *ngIf="anotherq[(config.currentPage - 1) * config.itemsPerPage + i]">
+              <ss-multiselect-dropdown [options]="myOptions" [settings]="selectsettings" [(ngModel)]="selected2[(config.currentPage - 1) * config.itemsPerPage + i +1]" (ngModelChange)="onChange($event)"></ss-multiselect-dropdown>	
+            </div>
+          </td>
+          <td>
+            {{ x.comment }}
+            <div style="margin-top:25px" *ngIf="anotherq[(config.currentPage - 1) * config.itemsPerPage + i]">
+              {{x.comment}}
+            </div>
+          </td>
+          <td align="center" *ngIf="showmessage[(config.currentPage - 1) * config.itemsPerPage + i +1]!=1;else message ">
+            
+            <button  class="btn btn-success" (click)="approveRow((config.currentPage - 1) * config.itemsPerPage + i +1 )">
+              <span class="glyphicon glyphicon-ok"></span>
+            </button>
+            
+            <button class="btn btn-danger" (click)="deleteRow((config.currentPage - 1) * config.itemsPerPage + i +1)">
+              <span class="glyphicon glyphicon-remove"></span>
+            </button>
+          </td>
+          
+          <ng-template #message>
+            <td>
+              <span style="color:green">Added to approved list</span>
+            </td>
+            
+          </ng-template>        
+        </tr>
+        
+        
+      </tbody>
+      
+      
+    </table> 
+    
+    
+    <div class="col-md-12 col-lg-12 col-sm-12" align="center">
+      <pagination-controls (pageChange)="config.currentPage = $event"  id="advanced"></pagination-controls>
+    </div>
+    
+    <div class="col-md-12" align="center">
+      <button type="button" class="btn btn-primary submitBtn" data-toggle="modal" data-target="#fbModal" (click)="sendjson()" >Submit</button>
+    </div>
+  </div>
+</div>
+</div> -->
+
+
+<div id="fbModal" class="modal fade" [ngStyle]="{'display':display}" role="dialog">
+  <div class="modal-dialog modal-sm">
+
+    <div class="modal-content submitModal">
+
+      <div *ngIf="datasent == true;">
+        <!-- <img src="../../assets/flying.png" alt=""> -->
+        <p style="color:green"> Data sent successfully for retraining.</p>
+<p>Reloading Page</p>
+</div>
+<!-- <ng-template #notsent>
+        <img src="../../assets/disconnected.png" alt="">
+        <p style="color:red">Data NOT sent due to Internal Server Error</p>
+      </ng-template>
+    -->
+<div *ngIf="datasent == false">
+  <p style="color:red">Data NOT sent due to Internal Server Error</p>
+</div>
+
+<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+</div>
+</div>
+</div>
+
+
+<bs-modal #feedbackModal>
+  <bs-modal-body align="center">
+    <div *ngIf="datasent == true;else notsent">
+
+      <img src="../../assets/flying.png" width="60%" alt="">
+      <p style="color:green"> Data sent successfully for retraining. Reloading Page</p>
+</div>
+
+<ng-template #notsent>
+  <img src="../../assets/disconnected.png" width="60%" alt="">
+  <p style="color:red">Data NOT sent due to Internal Server Error</p>
+</ng-template>
+</bs-modal-body>
+
+<bs-modal-footer>
+  <!-- <button type="button" class="btn btn-default" data-dismiss="modal" (click)="modal.dismiss()">Cancel</button> -->
+  <button type="button" class="btn btn-primary" (click)="modal.close()">Ok</button>
+</bs-modal-footer>
+</bs-modal>

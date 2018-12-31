@@ -1,0 +1,773 @@
+<ng-template #errormessage>
+    <h4 style="color:red;margin-top:25%;margin-left:40%"> Internal Server Error </h4>
+</ng-template>
+
+<ng-template #progressbar>
+    <div style="margin-left:37%;margin-top:10%" class="loader"></div>
+    <div style="margin-left:37%;margin-top:1%;font-size:110%"> Processing query... </div>
+</ng-template>
+
+<div *ngIf="!error;else errormessage" style="font-family: open_sansregular,sans-serif;">
+
+    <div class="secondRow row" style="margin-top:100px;">
+        <div [hidden]="!filter" class="col-md-3 col-lg-3 col-sm-3">
+            <app-filter #FilterComponent></app-filter>
+        </div>
+        <div [hidden]="!hr_filter" class="col-md-3 col-lg-3 col-sm-3">
+            <app-hr-filter #HRFilterComponent></app-hr-filter>
+        </div>
+        <div [hidden]="filter || hr_filter" class="alignment col-sm-2 col-md-2 col-lg-2"></div>
+
+        <div class="border col-md-9 col-lg-9">
+            <div class="searchContainer">
+                <form role="form" class="form-inline" action="">
+                    <div class="form-group search-here">
+                        <input *ngIf='showSearch' class="form-control" [disabled]="progress" id="item" type="text"
+                               [(ngModel)]="question" placeholder='Search' autocomplete="off" name="question" style="display:inline-block;width:450px;" />
+
+                        <div *ngIf='!showSearch' style='display:inline-block;width: 400px;'>
+                            <select class="form-control" id="sel1" (change)='selectQuestion($event);' style='display:inline-block;width: 400px;'>
+                                <option *ngFor='let question of questionMenu'>{{ question }}</option>
+                            </select>
+                        </div>
+                        <input id="inputsubmit" (click)="search(question)" type="submit" value="Go" />
+                        <div style="padding-left:5%" class="form-group">
+                            <a class="display">
+                                <img src="../../assets/haapy-smiley.png" (click)="modal2.open('sm')" alt="Good" height="25">
+                            </a>
+                            <a class="display">
+                                <img src="../../assets/sad-smiley.png" (click)="modal2.open('sm')" alt="Bad" height="25">
+                            </a>
+                        </div>
+                         <ul class="dropdown-menu scrollbar" *ngIf="showSuggestions==true" aria-labelledby="dropdownMenu1" style="overflow-y: scroll; position: relative; top: 0; left: 0; height:200px;width:450px;float: left;margin-left: 9%;">
+
+    <li id="item" class="item" style="padding-left:10px;line-height:40px;font-size:14px;cursor:pointer;" *ngFor="let item of items" (click)="select(item)">{{item}}</li>
+
+    </ul> 
+                    </div>
+
+                </form>
+            </div>
+
+
+            <ng-template #invalid>
+                <div *ngIf="!progress;else progressbar">
+                    <h4 style="color:red;margin-top:15%;margin-left:33%">{{ answer }}</h4>
+                </div>
+            </ng-template>
+
+            <div *ngIf="!invalid_search else invalid">
+
+                <div *ngIf="!progress;else progressbar">
+
+                    <ng-template #showpassage>
+                        <div style="padding-top:3%">
+
+                            <div *ngFor="let x of passagedetails;let i = index" class="panel panel-theme">
+
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12" style="padding:2%">
+                                            <img height="25" *ngIf="passagedocs[i].includes('.las')" src="../../assets/document-icon.png" alt="doc_icon">
+                                            <img height="25" *ngIf="passagedocs[i].includes('.pdf')" src="../../assets/pdf-icon.png" alt="pdf_icon">
+                                            <img height="25" *ngIf="passagedocs[i].includes('.xlsx')" src="../../assets/xlsx-icon.png" alt="xlsx_icon">
+                                            <strong style="color:#ed1c24">Source </strong> :
+
+                                            <a *ngIf="passagedocs[i]!='N/A';else nodocs" target="_blank" style="color:blue" href="../assets/data/{{passagedocs[i]}}">
+                                                Source Link
+                                            </a>
+                                            <br>
+                                            <br>
+                                            <ng-template #nodocs>
+                                                N/A
+                                            </ng-template>
+                                            {{ x }}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </ng-template>
+
+                    <div *ngIf="!passage;else showpassage">
+                        <div *ngIf="!edited;else notable" class="col-xs-12 col-lg-12 col-md-12" style="margin-top:2%">
+                            <div class="panel panel-theme">
+
+                                <div class="panel-heading">
+                                    Results
+                                </div>
+                                <div class=" panel-body" style="padding:2%">
+                                    <div *ngIf="resJSON.Data_Type=='HR_Data' && resJSON.Result_Type=='Single_Intent'" class="col-md-6 col-sm-12 col-lg-6">
+                                        <div *ngFor="let key of hrDataKeys">
+                                            <p>
+                                                <strong>{{ key!=0 ? key+" : " : "" }} </strong> {{resJSON.Result[''+key]}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div style="overflow-x: auto;" *ngIf="resJSON.Data_Type=='HR_Data' && resJSON.Result_Type=='Aggregation'" class="col-md-12 col-sm-12 col-lg-12">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Employee ID</th>
+                                                    <th *ngFor="let key of hrDataKeys">{{(key !=='Name' && key !== 'Email' && key!=='Employee ID') && key!=='Removed'?key:''}}</th>
+                                                    <th>Removed</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let d of result| paginate: { itemsPerPage: 5, currentPage: p, id:'first' };">
+                                                    <td>{{d['Employee ID']}}</td>
+                                                    <td *ngFor="let key of hrDataKeys">{{(key !=='Name' && key !== 'Email' && key!=='Employee ID') && key!=='Removed'?d[''+key]:''}}</td>
+                                                    <td>{{d['Removed']}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <br>
+                                    <div *ngIf="resJSON.Data_Type=='HR_Data' && resJSON.Result_Type=='Aggregation'" class="col-md-12 col-lg-12 col-sm-12" align="center">
+                                        <pagination-controls (pageChange)="p = $event" id="first"></pagination-controls>
+                                    </div>
+
+
+                                    <div *ngIf="resJSON.Data_Type!=='HR_Data'" class="col-md-6 col-sm-12 col-lg-6">
+                                        <p style="font-size: 18px;">{{ answer }}</p>
+                                        <p class="answer" *ngIf="!isDocument;else nodoc">
+                                            <strong> Document :</strong>
+                                            <a href="../../assets/data/{{ document }}" target="_blank"> Document </a>
+                                        </p>
+                                        <ng-template #nodoc>
+                                            <p>
+                                                <strong> Document : </strong>{{ document }}
+                                            </p>
+                                        </ng-template>
+                                    </div>
+
+                                    <div *ngIf="resJSON.Data_Type!=='HR_Data' && otherdata && !progress" class="col-md-6 col-sm-12 col-lg-6">
+                                        <p align="center" class="tableHeading">
+                                            <strong>Available data types for this well</strong>
+                                        </p>
+                                        <div class="">
+                                            <table class="table table-bordered">
+                                                <thead class="tableHeader">
+                                                    <tr>
+                                                        <th>Well Logs</th>
+                                                        <th>Seismic</th>
+                                                        <th>Synthetics</th>
+                                                        <th>Checkshot </th>
+                                                        <th>VSP </th>
+                                                        <th>Well Design </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <span>
+                                                                <a *ngIf="(otherdata && otherdata.Well_Documents.Well_Logs!='Not Available');else nowelllogs"
+                                                                    href="../../assets/data/{{otherdata.Well_Documents.Well_Logs }}"
+                                                                    target="_blank">
+                                                                    Well Logs
+                                                                </a>
+                                                                <ng-template #nowelllogs>
+                                                                    N/A
+                                                                </ng-template>
+                                                            </span>
+
+                                                        </td>
+                                                        <td>
+
+                                                            <a href="../assets/data/{{otherdata.Well_Documents.Seismic}}" *ngIf="otherdata.Well_Documents.Seismic!='Not Available';else noseismic"
+                                                                target="_blank">
+                                                                Seismic
+                                                            </a>
+                                                            <ng-template #noseismic>
+                                                                N/A
+                                                            </ng-template>
+
+                                                        </td>
+                                                        <td>
+                                                            <a href="../assets/data/{{otherdata.Well_Documents.Synthetics}}" *ngIf="otherdata.Well_Documents.Synthetics!='Not Available';else nosyn"
+                                                                target="_blank">
+                                                                Synthetics
+                                                            </a>
+                                                            <ng-template #nosyn>
+                                                                N/A
+                                                            </ng-template>
+                                                        </td>
+                                                        <td>
+                                                            <a href="../assets/data/{{otherdata.Well_Documents.Checkshot}}" *ngIf="otherdata.Well_Documents.Checkshot!='Not Available';else nocheck"
+                                                                target="_blank">
+                                                                Checkshot
+                                                            </a>
+                                                            <ng-template #nocheck>
+                                                                N/A
+                                                            </ng-template>
+
+                                                        </td>
+                                                        <td>
+                                                            <a href="../assets/data/{{otherdata.Well_Documents.VSP}}" *ngIf="otherdata.Well_Documents.VSP!='Not Available';else novsp"
+                                                                target="_blank">
+                                                                VSP
+                                                            </a>
+                                                            <ng-template #novsp>
+                                                                N/A
+                                                            </ng-template>
+
+                                                        </td>
+                                                        <td *ngIf="otherdata.Well_Documents.Well_Design && otherdata.Well_Documents.Well_Design != 'Not Available';else nowelldesign">
+                                                            <span>
+                                                                <a href="../../assets/data/{{ otherdata.Well_Documents.Well_Design }}" target="_blank">
+
+                                                                    Well Design
+                                                                </a>
+                                                            </span>
+                                                        </td>
+                                                        <ng-template #nowelldesign>
+                                                            <td>
+                                                                N/A
+                                                            </td>
+                                                        </ng-template>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="resJSON.Data_Type!=='HR_Data'" class="panel-footer">
+                                    <strong>Source :</strong> {{source}}
+
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="col-md-12">
+                                    <div *ngIf="resJSON.Result_Type!=='Aggregation'" class="panel panel-theme">
+                                        <div class="panel-body" style="padding:2%">
+                                            <span class="pull-right" *ngIf="resJSON.Data_Type!=='HR_Data'"> Last Modified : {{last_modified}} </span>
+                                            <div class="row">
+                                                <div *ngIf="resJSON.Data_Type!=='HR_Data'" class="col-md-4">
+                                                    <p>
+                                                        <strong>Well Report:</strong>
+
+                                                        <a *ngIf="otherdata.Well_Documents.Well_Report && otherdata.Well_Documents.Well_Report != 'Not Available';else nowellreport" href="../../assets/data/{{ otherdata.Well_Documents.Well_Report }}"
+                                                            target="_blank">
+                                                            <img height="25" *ngIf="otherdata.Well_Documents.Well_Report.includes('.las')" src="../../assets/document-icon.png" alt="doc_icon">
+                                                            <img height="25" *ngIf="otherdata.Well_Documents.Well_Report.includes('.pdf')" src="../../assets/pdf-icon.png" alt="pdf_icon">
+                                                            <img height="25" *ngIf="otherdata.Well_Documents.Well_Report.includes('.xlsx')" src="../../assets/xlsx-icon.png" alt="xlsx_icon">
+                                                            <!-- {{ otherdata.Well_Documents.Well_Report }} -->
+                                                            Well Report
+                                                        </a>
+                                                        <ng-template #nowellreport>
+                                                            N/A
+                                                        </ng-template>
+
+                                                    </p>
+                                                    <p>
+                                                        <strong>Injection Data :</strong>
+
+                                                        <a *ngIf="otherdata.Well_Documents.Injection_Data && otherdata.Well_Documents.Injection_Data != 'Not Available';else noinjection" href="../../assets/data/{{ otherdata.Well_Documents.Injection_Data }}"
+                                                            target="_blank">
+                                                            <img height="25" *ngIf="otherdata.Well_Documents.Injection_Data.includes('.las')" src="../../assets/document-icon.png" alt="doc_icon">
+                                                            <img height="25" *ngIf="otherdata.Well_Documents.Injection_Data.includes('.pdf')" src="../../assets/pdf-icon.png" alt="pdf_icon">
+                                                            <img height="25" *ngIf="otherdata.Well_Documents.Injection_Data.includes('.xlsx')" src="../../assets/xlsx-icon.png" alt="xlsx_icon">
+                                                            <!-- {{otherdata.Well_Documents.Injection_Data }} -->
+                                                            Injection Data
+                                                        </a>
+                                                        <ng-template #noinjection>
+                                                            N/A
+                                                        </ng-template>
+                                                    </p>
+                                                    <p>
+                                                        <strong>Production Data :</strong>
+
+                                                        <a *ngIf="otherdata.Well_Documents.Production_Data && otherdata.Well_Documents.Production_Data != 'Not Available';else noproduction" href="../../assets/data/{{ otherdata.Well_Documents.Production_Data }}"
+                                                            target="_blank">
+                                                            <img height="25" *ngIf="otherdata.Well_Documents.Production_Data.includes('.las')" src="../../assets/document-icon.png" alt="doc_icon">
+                                                            <img height="25" *ngIf="otherdata.Well_Documents.Production_Data.includes('.pdf')" src="../../assets/pdf-icon.png" alt="pdf_icon">
+                                                            <img height="25" *ngIf="otherdata.Well_Documents.Production_Data.includes('.xlsx')" src="../../assets/xlsx-icon.png" alt="xlsx_icon">
+                                                            <!-- {{ otherdata.Well_Documents.Production_Data }} -->
+                                                            Production Data
+                                                        </a>
+                                                        <ng-template #noproduction>
+                                                            N/A
+                                                        </ng-template>
+                                                    </p>
+                                                </div>
+                                                <div *ngIf="resJSON.Data_Type==='HR_Data'" class="col-md-4">
+                                                    <div *ngIf="resJSON.Result_Type==='Single_Intent'">
+                                                            <p>
+                                                                    <strong>Name:</strong>
+                                                                    {{resJSON.Other_Data.Name}}
+                                                                </p>
+                                                                <p>
+                                                                    <strong>Employee ID :</strong>
+                                                                    {{resJSON.Other_Data['Employee ID']}}
+                                                                </p>
+                                                                <p>
+                                                                    <strong>Email :</strong>
+            
+                                                                    {{resJSON.Other_Data['Email']}}
+                                                                </p>
+                                                    </div>
+                                                </div>
+
+
+                                                <div *ngIf="resJSON.Data_Type!=='HR_Data'" class="col-md-8 pull-right">
+                                                    <a class=" display1 pull-right">
+                                                        <span class="reports glyphicon glyphicon-eye-open "></span> Quick View
+                                                    </a>
+                                                    <a class=" display1 pull-right">
+                                                        <span class="reports glyphicon glyphicon-list-alt "></span> More Details
+                                                    </a>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div *ngIf="resJSON.Data_Type=='HR_Data' && resJSON.Result_Type=='Aggregation'">
+                                    <div *ngFor="let d of resJSON.Result | paginate: { itemsPerPage: 5, currentPage: p, id:'first' };" class="panel panel-theme">
+                                        <div class="panel-body">
+                                            <p>
+                                                <strong>Name :</strong>
+                                                {{d.Name}}
+                                            </p>
+                                            <p>
+                                                <strong>Employee ID :</strong>
+                                                {{d['Employee ID']}}
+                                            </p>
+                                            <p>
+                                                <strong>Email :</strong>
+                                                {{d['Email']}}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-12 col-sm-12" align="center">
+                                            <pagination-controls (pageChange)="p = $event" id="first"></pagination-controls>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <ng-template #notable>
+
+                        <div class="col-md-12" style="margin-top:2%;">
+
+                            <ng-template *ngIf="resJSON.Result_Type!=='HR_Data'" #coretable>
+
+                                <!-- ***************************************************** -->
+                                <div class="">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Well Name</th>
+                                                <th>Lease Name</th>
+                                                <th>Operator Name</th>
+                                                <th>Spud Date</th>
+                                                <th>Status</th>
+                                                <th>Total Depth (ft)</th>
+                                                <th>Type</th>
+                                                <th>Core Data</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let x of result | paginate: { itemsPerPage: 5, currentPage: p, id:'first' };let i = index">
+                                                <td>{{ x.Well_name }}</td>
+                                                <td>{{ x.Lease_Name }}</td>
+                                                <td>{{ x.Operator }}</td>
+                                                <td>{{ x.Spud_Date }}</td>
+                                                <td>{{ x.Status }} </td>
+                                                <td>{{ x.Total_Depth }} </td>
+                                                <td>{{ x.Type }} </td>
+                                                <td>
+                                                    <a data-toggle="modal" (click)="modal(i)" data-target="#myModal">Click</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                                <div class="col-md-12 col-lg-12 col-sm-12" align="center">
+                                    <pagination-controls (pageChange)="p = $event" id="first"></pagination-controls>
+                                </div>
+                                <!-- Modal -->
+                                <div class="modal fade" id="myModal" role="dialog">
+                                    <div class="modal-dialog">
+
+                                        <!-- Modal content-->
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                Core Data
+                                                <button type="button" class="close" data-dismiss="modal">&times; </button>
+                                                <!-- <h4 class="modal-title">Modal Header</h4> -->
+                                            </div>
+                                            <div class="modal-body">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Core ID</th>
+                                                            <th>Core Type</th>
+                                                            <th>TopDepth (ft)</th>
+                                                            <th>Core Diameter (ft)</th>
+                                                            <th>Porosity Length (ft)</th>
+                                                            <th>Interval Thickness (ft)</th>
+                                                            <th>Core Length(ft)</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let y of core;let i = index">
+                                                            <td>{{ y.CoreId }}</td>
+                                                            <td>{{ y.CoreType }}</td>
+                                                            <td>{{ y.TopDepth }}</td>
+                                                            <td>{{ y.CoreDiameter }}</td>
+                                                            <td>{{ y.PorosityLength }}</td>
+                                                            <td>{{ y.IntervalThickness }}</td>
+                                                            <td>{{ y.CoreLength }}</td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- ************************************************** -->
+                            </ng-template>
+
+
+                            <div *ngIf="coredata;else coretable">
+                                <ng-template #noresult>
+                                    <h2 style="margin-top:15%" align="center">No results found</h2>
+                                </ng-template>
+
+                                <div *ngIf="answer.length != 0;else noresult">
+
+                                    <table style="font-size:90%" class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th *ngFor="let tabKey of tableKey">{{tabKey}}</th>
+                                                <!-- <th *ngFor="let c of answer[0] | key">{{ c }}</th> -->
+                                                <!-- <th>Well Name </th>
+                                                <th>Lease Name </th>
+                                                <th>Operator </th>
+                                                <th>Spud Date</th>
+                                                <th>Status</th>
+                                                <th>Total Depth (ft)</th>
+                                                <th>Type </th>
+
+                                                <th>Well Logs</th>
+                                                <th>Seismic</th>
+                                                <th>Synthetics</th>
+                                                <th>VSP</th>
+                                                <th>Checkshot</th>
+                                                <th>Well Design</th>
+                                            </tr> -->
+
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let x of answer | paginate: { itemsPerPage: 5, currentPage: pp, id:'second' };let i = index">
+                                                <td *ngFor="let tabKey of tableKey">{{x[tabKey]}}</td>
+                                                <!-- <td> {{ x.Well_name }}</td>
+
+                                                <td> {{ x.Lease_Name }}</td>
+                                                <td> {{ x.Operator }}</td>
+                                                <td> {{ x.Spud_Date }}</td>
+                                                <td> {{ x.Status }} </td>
+                                                <td> {{ x.Total_Depth }} </td>
+                                                <td> {{ x.Type }} </td>
+                                                <td>
+                                                    <a *ngIf="x.well_docs.Well_Logs != 'Not Available';else nowelllogs" href="../assets/data/{{x.well_docs.Well_Logs}}" target="_blank">
+                                                        
+                                                        Well Logs
+                                                    </a>
+                                                    <ng-template #nowelllogs>
+                                                        N/A
+                                                    </ng-template>
+                                                </td>
+                                                <td>
+                                                    <a href="../assets/data/{{x.well_docs.Seismic}}" *ngIf="x.well_docs.Seismic != 'Not Available';else noseismic1" target="_blank">
+                                                        
+                                                        Seismic
+                                                    </a>
+                                                    <ng-template #noseismic1>
+                                                        N/A
+                                                    </ng-template>
+
+                                                </td>
+                                                <td>
+
+                                                    <a href="../assets/data/{{x.well_docs.Synthetics}}" *ngIf="x.well_docs.Synthetics != 'Not Available';else nosyn1" target="_blank">
+                                                       
+                                                        Synthetics
+                                                    </a>
+                                                    <ng-template #nosyn1>
+                                                        N/A
+                                                    </ng-template>
+
+                                                </td>
+                                                <td>
+
+                                                    <a href="../assets/data/{{x.well_docs.VSP}}" *ngIf="x.well_docs.VSP != 'Not Available';else novsp1" target="_blank">
+                                                      
+                                                        VSP
+                                                    </a>
+                                                    <ng-template #novsp1>
+                                                        N/A
+                                                    </ng-template>
+                                                </td>
+                                                <td>
+                                                    <a href="../assets/data/{{x.well_docs.Checkshot}}" *ngIf="x.well_docs.Checkshot != 'Not Available';else nochk1" target="_blank">
+                                                        
+                                                        Checkshot
+                                                    </a>
+                                                    <ng-template #nochk1>
+                                                        N/A
+                                                    </ng-template>
+
+                                                </td>
+                                                <td>
+                                                    <a *ngIf="x.well_docs.Well_Design != 'Not Available';else nowelldesign" href="../assets/data/{{x.well_docs.Well_Design}}"
+                                                        target="blank">
+                                                      
+                                                        Well Design
+                                                    </a>
+                                                    <ng-template #nowelldesign>
+                                                        N/A
+                                                    </ng-template>
+                                                </td> -->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="col-md-12 col-lg-12 col-sm-12" align="center">
+                                        <pagination-controls (pageChange)="pp = $event" id="second"></pagination-controls>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="panel panel-theme " *ngFor="let x of answer  | paginate: { itemsPerPage: 2, currentPage: ppp, id:'third' }">
+
+                                <!-- <div class="panel-heading">
+                                    {{ x.Well_name }}
+                                    <span class="pull-right"> Last Modified : </span>
+                                </div> -->
+                                <div class="panel-body" style="padding:2%">
+                                    <span class="pull-right"> Last Modified : {{x.Last_modified}}</span>
+
+
+                                    <div class="row">
+
+
+                                        <div class="col-md-4">
+                                            <p style="font-size:100%;color:#ed1c24">
+                                                <strong>{{x.Well_name}}</strong>
+                                            </p>
+                                            <p>
+                                                <strong> Well Report : </strong>
+                                                <a *ngIf="x.well_docs.Well_Report != 'Not Available';else nowellreport" href="../assets/data/{{ x.well_docs.Well_Report }}"
+                                                    target="_blank">
+                                                    <!-- {{ x.well_docs.Well_Report }} -->
+                                                    Well Report
+                                                </a>
+                                                <ng-template #nowellreport>
+                                                    <!-- {{ x.well_docs.Well_Report }} -->
+                                                    N/A
+                                                </ng-template>
+                                            </p>
+
+                                            <p>
+                                                <strong> Injection Data :</strong>
+
+                                                <a *ngIf="x.well_docs.Injection_Data != 'Not Available';else noinjection" href="../assets/data/{{ x.well_docs.Injection_Data }}"
+                                                    target="_blank">
+                                                    <!-- {{ x.well_docs.Injection_Data }} -->
+                                                    Injection Data
+                                                </a>
+
+                                                <ng-template #noinjection>
+                                                    <!-- {{ x.well_docs.Injection_Data }}
+                                                    -->
+                                                    N/A
+                                                </ng-template>
+                                            </p>
+                                            <p>
+                                                <strong> Production Data :</strong>
+                                                <a *ngIf="x.well_docs.Production_Data != 'Not Available';else noproduction" href="../assets/data/{{ x.well_docs.Production_Data }}"
+                                                    target="_blank">
+                                                    <!-- {{ x.well_docs.Production_Data }} -->
+                                                    Production Data
+                                                </a>
+                                                <ng-template #noproduction>
+                                                    <!-- {{ x.well_docs.Production_Data }} -->
+                                                    N/A
+                                                </ng-template>
+                                            </p>
+
+                                        </div>
+
+                                        <div class="col-md-8 ">
+                                            <!-- <a class=" display1 pull-right">
+                                                <span class="reports glyphicon glyphicon-file "></span> Reports
+                                            </a>
+                                            <a class=" display1 pull-right">
+                                                <span class="reports glyphicon glyphicon-shopping-cart "></span> Add to Cart
+                                            </a> -->
+                                            <a class=" display1 pull-right">
+                                                <span class="reports glyphicon glyphicon-eye-open "></span> Quick View
+                                            </a>
+                                            <a class=" display1 pull-right">
+                                                <span class="reports glyphicon glyphicon-list-alt "></span> More Details
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="answer.length != 0;" class="col-md-12 col-lg-12 col-sm-12" align="center">
+                            <pagination-controls (pageChange)="ppp = $event" id="third"></pagination-controls>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--<button type="button" class="feedback btn btn-md btn-primary" data-toggle="modal" data-target="#myModal1" (click)="feedback()"> Feedback </button> -->
+
+
+<!-- <button type="button" class="feedback btn btn-md btn-primary" (click)="modal2.open('sm')"> Feedback </button> -->
+
+
+<bs-modal #feedback >
+    <bs-modal-header [showDismiss]="true">
+        <h4>Feedback</h4>
+    </bs-modal-header>
+    <bs-modal-body align="center">
+        <form>
+            <div style="text-align:left">
+                <strong>Query :</strong> {{question}}
+            </div><br>
+            <div class="commentBox">
+                <textarea name="message" [(ngModel)]="comment" rows="5" cols="30" class="textarea1" placeholder="Enter your comments here"></textarea>
+            </div>
+            <br>
+            <button type="button" (click)="feedbacksubmit(comment)" class="btn btn-default"> Submit </button>
+
+        </form>
+    </bs-modal-body>
+
+</bs-modal>
+
+
+<bs-modal #feedbackstatus>
+    <bs-modal-body align="center">
+        <div *ngIf="feedsuccess;else feedfail">
+            <img style="color:green" width="80%" style="width:40%" src="../../assets/handshake.png" alt="">
+            <p style="color:green">Feedback submitted successfully..!!</p>
+        </div>
+        <ng-template #feedfail>
+            <img width="80%" src="../../assets/feedback-fail.png" width="40%" alt="">
+
+            <p style="color:red">Feedback not submitted due to internal error</p>
+        </ng-template>
+        <button type="button" class="btn btn-default" (click)="modal3.close()">Close</button>
+    </bs-modal-body>
+</bs-modal>
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal1" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Feedback</h4>
+            </div>
+            <div class="modal-body container">
+
+
+
+                <form>
+
+                    <div class="commentBox">
+                        <textarea name="message" [(ngModel)]="comment" rows="5" cols="35" class="textarea1" placeholder="Enter your comments here"></textarea>
+                    </div>
+                </form>
+                <div *ngIf="toshow">
+
+                    <!-- <div *ngIf="feedsuccess;else feedfail">
+                        <p style="color:green">Feedback submitted successfully..!!</p>
+                    </div>
+                    <ng-template #feedfail>
+                        <p style="color:red">Feedback not submitted due to internal error</p>
+                    </ng-template> -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" (click)="feedbacksubmit(comment)" data-target="#myModal2" data-toggle="modal" data-dismiss="modal"
+                    class="btn btn-default"> Submit </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal2" id="myModal2" role="dialog" data-toggle="modal2">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content submitModal">
+            <div *ngIf="feedsuccess;else feedfail">
+                <img width="80%" style="width:40%;color:green;" src="../../assets/handshake.png" alt="">
+                <p style="color:green">Feedback submitted successfully..!!</p>
+            </div>
+            <ng-template #feedfail>
+                <img width="80%" src="../../assets/feedback-fail.png" width="40%" alt="">
+
+                <p style="color:red">Feedback not submitted due to internal error</p>
+            </ng-template>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+<!--showing the links(start)-->
+
+<div *ngIf="show_links" style="width:69%; margin:0px auto;margin-left:18.9%">
+    <div class="row">
+        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12" style="padding:2%;margin-left:2%">
+            <strong style="color:#dd002a">Other Source Links</strong> :
+            <br>
+        </div>
+    </div>
+    <br>
+    <div *ngFor="let link of links" class="panel panel-theme" style="padding:5px">
+        <div class="panel-body">
+            <a id="link-title" [href]="link.link" target="_blank" style="color:#1a0dab !important;text-decoration: none;margin:5px 0px;padding: 5px 10px;">
+                <strong style="margin-left:-10px">{{link.title}}</strong></a>
+
+                <br>
+                <a [href]="link.link" target="_blank" style="color:forestgreen;margin-top:-15px">{{link.link}}</a>
+                <br>
+                <br>
+                <div style="color:black">
+                    {{link.description}}
+                </div>
+            <!-- </a> -->
+        </div>
+    </div>
+</div>

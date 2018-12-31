@@ -1,0 +1,12 @@
+/* You can add global styles to this file, and also import other style files */
+body {
+    display: flex;
+    font-family: 'open_sansregular', sans-serif;
+    color: dimgrey;
+   }
+
+app-root {
+    display: flex;
+    width: 100%;
+    color: dimgrey;
+}

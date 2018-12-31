@@ -1,0 +1,47 @@
+<div class="container" style="font-family: 'Ubuntu', sans-serif;">
+<div class="row">
+
+	<div class="center" align="center">
+
+		<!-- <h1 id="title">Petro Technical Search For Upstream</h1> -->
+
+		<form role="form" style="padding-top:40%">
+<!-- <input name='q' class="form-control" [(ngModel)]="question" placeholder="Search">
+					<br>
+					<button class="btn btn-primary" type="submit" (click)="sendquestion(question)">Search</button> -->
+            <div class="form-group">
+                <!--<input id="input" type="text" [(ngModel)]="question" placeholder='Search' name="question"  style="display:inline-block" /> -->
+                <!--<md2-autocomplete id="input" type="text" [(ngModel)]="question" placeholder='Search' name="question" [items]="items" item-text="name" item-value="value" 
+            (keyup)="selected($event)" style="display:inline-block;text-align:left; border:none;box-shadow:0 0 0px white; padding-bottom:30px; margin-bottom:20px;"></md2-autocomplete>
+             -->
+                <!-- <button class="btn btn-success" (click)='toggle()'>{{ showSearch ? 'Menu' : 'Search Box'}}</button> -->
+                <!--(blur)="showSuggestions = false"-->
+                <!--(keypress)="selected($event)" (keydown)="highlightSuggestions($event)"-->
+                <input *ngIf='showSearch' class="form-control" id="item" autocomplete="off" type="text" data-toggle="dropdown"
+                       id="dropdownMenu1" aria-haspopup="true" aria-expanded="true"
+                       [(ngModel)]="question" placeholder='Search' name="question" style="display:inline-block;width:450px;" />
+                <div *ngIf='!showSearch' style="display:inline-block;width:450px;">
+                    <select class="form-control" id="sel1" (change)='selectQuestion($event);' style="display:inline-block;width:450px;">
+                        <option *ngFor='let question of questionMenu'>{{ question }}</option>
+                    </select>
+                </div>
+
+
+                <input id="inputsubmit" (click)="sendquestion(question)" type="submit" value="Search">
+
+                <ul class="dropdown-menu scrollbar" *ngIf="showSuggestions==true" aria-labelledby="dropdownMenu1" style="overflow-y: scroll; position: relative; top: 0; left: 0; height:200px;width:450px;float: left;margin-left: 72px;">
+
+                    <li id="item" class="item" style="padding-left:10px;line-height:40px;font-size:14px;cursor:pointer;" *ngFor="let item of items" (click)="select(item)">{{item}}</li>
+
+                </ul>
+
+
+                <br>
+                <!--<input  id="inputsubmit" (click)="sendquestion(question)" type="submit" value="Search">  -->
+            </div>
+</form>
+
+</div>
+</div>
+
+</div>

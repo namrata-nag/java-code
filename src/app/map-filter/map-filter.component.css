@@ -1,0 +1,15 @@
+.card {
+    box-shadow: 0px 2px 3px #bbaeae;
+}
+
+.card:hover {
+    box-shadow: 0px 2px 6px #bbaeae;
+}
+
+.result-head {
+    text-align: center;
+}
+
+.result-head {
+    border-bottom: 2px grey;
+}
